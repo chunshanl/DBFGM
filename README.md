@@ -11,9 +11,9 @@ ______________________________
 
 ## Introduction
 
-The repository contains the R code for the proposed Dynamic Bayesian Functional Graphical Model. The proposed model is a Bayesian graphical model for multivariate functional data where each curve is a function over time. Each node in the resulting graph is a function inside a time interval.
+The repository contains the R code for the proposed Dynamic Bayesian Functional Graphical Model. The proposed model is a Bayesian graphical model for multivariate time series data. We model each time series as a function over time and add a change point in time to introduce dynamics. The resulting graphs represent the conditional dependencies among random functions, where each node is a random function instead of a scalar variable.
 
-An example of applying the proposed model and doing posterior analysis can be found in Application_study. The repository also contains R code to reproduce all results in the simulation study and application study.
+An example of applying the proposed model and doing posterior analysis can be found in Application_study.R. The repository also contains R code to reproduce all results in the simulation study and application study.
 
 ## Files:
 
@@ -22,10 +22,7 @@ An example of applying the proposed model and doing posterior analysis can be fo
 
 - Application_study.R
   - This script can reproduce results in the application study on the sea surface temperature data. 
-  - This script contains an example to run the proposed dynamic Bayesian functional graphical model.
-
-- MCMC_algorithms
-  - This folder contains the MCMC algorithms of proposed dynamic Bayesian Graphical models.
+  - This script is an example to run the proposed dynamic Bayesian functional graphical model.
 
 - Helper functions
   - This folder contains helper functions for the MCMC algorithms and for regenerating the results presented in the paper. They are called in the script and don't need to be run independently.
@@ -33,7 +30,7 @@ An example of applying the proposed model and doing posterior analysis can be fo
   - MCMC_changepoint_DBFGM.R: MCMC algorithm of the proposed dynamic Bayesian functional graphical model. It is called by call_DBFGM.R.
 
 - sst.csv
-  - The sea surface temperature data set. It is available on the [ERA5 website] (https://cds.climate.copernicus.eu/cdsapp#!/search?type=dataset).
+  - The sea surface temperature data set. It is available on the [ERA5 website] (https://cds.climate.copernicus.eu/cdsapp#!/search?type=dataset). The processed data is also provided for convenience.
 
 ## Acknowledgements
 

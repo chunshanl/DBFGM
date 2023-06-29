@@ -55,7 +55,7 @@ MCMC_changepoint_DBFGM = function(Y,
   ind_noi_all = compute_ind_noi(p_all)
   # expand pii_block
   pii_block_expand = list()
-  for (s_i in 1:2){ pii_block_expand[[s_i]] =  kronecker(pii_block[[s_i]], matrix(1, K, K))}
+  for (s_i in 1:2){ pii_block_expand[[s_i]] = kronecker(pii_block[[s_i]], matrix(1, K, K))}
   
   # Store the MCMC output----------------------------------------------------------------------------
   C_save = list(); pii_block_save = list(); B_save = list(); sigma_epsilon_save = list()
@@ -65,7 +65,8 @@ MCMC_changepoint_DBFGM = function(Y,
     B_save[[s_i]] = array(NA, c(n, p_all, nsave))
     sigma_epsilon_save[[s_i]] = rep(NA, nsave)
   }
-  Sig_save = C_save; adj_save = C_save
+  #Sig_save = C_save; 
+  adj_save = C_save
   changepoint_save = rep(NA, nsave)
   
   # Run the MCMC ----------------------------------------------------------------------------
@@ -74,7 +75,7 @@ MCMC_changepoint_DBFGM = function(Y,
   for(iter in 1:nmc){
     
     # Display result
-    if( disp & (iter %% 100 == 0) ){
+    if( disp & (iter %% 500 == 0) ){
       cat('iter =', iter, '\n')
       print(changepoint)
     }  
@@ -110,20 +111,20 @@ MCMC_changepoint_DBFGM = function(Y,
       kernel_list[[s_i]] = kernel
     }
 
-    kernel_1 = rowSums(colSums(kernel_list[[1]]))
-    kernel_2 = rowSums(colSums(kernel_list[[2]]))
+    kernel_1 = rowSums(colSums(kernel_list[[1]]))/sigma_epsilon[1]^2
+    kernel_2 = rowSums(colSums(kernel_list[[2]]))/sigma_epsilon[2]^2
     kernal_sum_all_changepoints = rep(NA, T_data)
-    for (changepoint_temp in p:(T_data-p)){
+    for (changepoint_temp in changepoint_interval[1]:changepoint_interval[2]){
       kernal_sum_all_changepoints[changepoint_temp] =
         sum(kernel_1[1:(changepoint_temp-1)]) +
         sum(kernel_2[changepoint_temp:T_data])
     }
-
-    w1 = - 0.5 * kernal_sum_all_changepoints  / sigma_epsilon^ 2
+    kernal_sum_all_changepoints = kernal_sum_all_changepoints[changepoint_interval[1]:changepoint_interval[2]]
+    
+    w1 = - 0.5 * kernal_sum_all_changepoints
     w1_max = max(w1, na.rm = TRUE)
     w = exp(w1 - w1_max)
-    w = w[p:(T_data-p)]
-    changepoint = sample(p:(T_data-p), 1, prob=w)
+    changepoint = sample(changepoint_interval[1]:changepoint_interval[2], 1, prob=w)
     interval_ind = matrix(NA, 2, 2)
     interval_ind[1,] = c(1, changepoint - 1)
     interval_ind[2,] = c(changepoint, T_data)
@@ -137,7 +138,7 @@ MCMC_changepoint_DBFGM = function(Y,
     # Store output----------------------------------------------------------------------------
     if (iter > nburn){
       for (s_i in 1:2){
-        Sig_save[[s_i]][,,iter - nburn] = Sig[[s_i]]
+        #Sig_save[[s_i]][,,iter - nburn] = Sig[[s_i]]
         C_save[[s_i]][,,iter - nburn] = C[[s_i]]
         adj_save[[s_i]][,,iter - nburn] = adj[[s_i]]
         pii_block_save[[s_i]][,,iter - nburn] = pii_block[[s_i]]
@@ -155,7 +156,7 @@ MCMC_changepoint_DBFGM = function(Y,
   for (jj in 1:2){
     mcmc_output[[jj]] = list()
     mcmc_output[[jj]]$C_save = C_save[[jj]]
-    mcmc_output[[jj]]$Sig_save = Sig_save[[jj]]
+    #mcmc_output[[jj]]$Sig_save = Sig_save[[jj]]
     mcmc_output[[jj]]$adj_save = adj_save[[jj]]
     mcmc_output[[jj]]$pii_block_save = pii_block_save[[jj]]
     mcmc_output[[jj]]$B_save = B_save[[jj]]

@@ -470,3 +470,68 @@ print_results = function(performance_graph, data){
 }
 
 
+
+
+get_mcmc_perf_graph = function(mcmc_output_oneint, data_oneint, 
+                                          K, p, standardize, block_thresh, disp = TRUE){
+  blocked_SSSL_performance = list()
+  
+  ppi_local = apply(mcmc_output_oneint$adj_save, c(1,2), mean)
+  adj_local = ppi_local > block_thresh
+  # pheatmap(adj_local + 0, cluster_rows = F, cluster_cols = F)
+  Omega_b = apply(mcmc_output_oneint$C_save, c(1,2), mean)
+  if (standardize){
+    sdY = apply(data_oneint$Y,2,sd)
+    Omega_b = diag(1/sdY) %*% Omega_b %*% diag(1/sdY)
+  }
+  Omega_b[!adj_local]=0
+  
+  # Blocked graph performance - version 1
+  adj_block = matrix(FALSE, p, p)
+  for (i in 1:(p-1)){
+    for (j in (i+1):p){
+      adj_block[i,j] = sum(adj_local[ ((i-1)*K+1):(i*K),  ((j-1)*K+1):(j*K) ]) >0
+    }
+  }
+  diag(adj_block) = TRUE
+  adj_block = adj_block | t(adj_block)
+  adj_block_v1 = adj_block
+  output = get_tp_fp_tn_fn(data_oneint$G_x_true, adj_block_v1)
+  perf = list()
+  perf$tpr_block = output$tp / (output$tp + output$fn) # tpr
+  perf$fpr_block = output$fp / (output$fp + output$tn) # fpr
+  perf$mcc_block = (output$tp * output$tn - output$fp * output$fn) /
+    (sqrt(output$tp + output$fp) * sqrt(output$tp + output$fn) * sqrt(output$tn + output$fp) * sqrt(output$tn + output$fn))
+  blocked_SSSL_performance$block_perf = perf
+
+  # Local graph performance
+  if (K == data_oneint$K_true){
+    perf = list()
+    perf = get_perf_graph(data_oneint$G_b_true, ppi_local, data_oneint$Omega_b_true, Omega_b)
+    blocked_SSSL_performance$local_perf = perf
+  }
+  
+  # Save MCMC summaries
+  blocked_SSSL_performance$ppi_local = ppi_local
+  blocked_SSSL_performance$Omega_b = Omega_b
+  blocked_SSSL_performance$adj_local = adj_local
+  blocked_SSSL_performance$adj_block = adj_block
+  
+  return(blocked_SSSL_performance)
+  
+}
+
+
+
+print_mcmc_results = function(performance_graph, data){
+  cat('Graph Estimation: TPR =', round(performance_graph$block_perf$tpr_block,2),
+      ', FPR =', round(performance_graph$block_perf$fpr_block,2), 
+      ', MCC =', round(performance_graph$block_perf$mcc_block,2),'\n')
+  if (K == data$K_true){
+    cat('Coefficient space Graph Estimation: TPR =', round(performance_graph$local_perf$tpr,2),
+        ', FPR =', round(performance_graph$local_perf$fpr,2), 
+        ', MCC =', round(performance_graph$local_perf$mcc,2))
+  }
+  
+}
+

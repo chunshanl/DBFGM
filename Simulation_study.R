@@ -75,13 +75,13 @@ changepoint_interval = c(changepoint_true - 20, changepoint_true + 20)  # constr
 
 ### Run MCMC -------------------------------------------------------
 ## Set up MCMC
-nburn = 0; nsave = 5000; 
+nburn = 3000; nsave = 2000; 
 nrep = 25
 folder_name = "Simulation_results_DBFGM"  # folder to save results
 dir.create(folder_name)
 
-rep_ind = 1
-for (rep_ind in c(14,15)){ 
+rep_ind = 25
+for (rep_ind in 1:2){ 
   print(rep_ind)
   
   ## Load data 
@@ -92,7 +92,7 @@ for (rep_ind in c(14,15)){
   
   set.seed(12345 + rep_ind)
   ## Run
-  mcmc_output_DBFGM = call_DBFGM(data_changepoint_rep,   
+  mcmc_output = call_DBFGM(data_changepoint_rep,   
                                  K, basis_type,
                                  v0, v1, a_pi, b_pi,
                                  changepoint_interval,
@@ -101,37 +101,38 @@ for (rep_ind in c(14,15)){
   ## Save results
   folder_name = "Simulation_results_DBFGM"
   file_name = paste("MCMC_output_DBFGM_rep", rep_ind, ".Rdata", sep = "")
-  save(mcmc_output_DBFGM, file=paste(folder_name, '/', file_name, sep = ""))
+  save(mcmc_output, file=paste(folder_name, '/', file_name, sep = ""))
   
   ## Delete more burn-in period 
-  mcmc_output = mcmc_output_DBFGM
-  nburn_perf = 3000
-  nsave_perf = 2000
-  mcmc_output$changepoint_save = mcmc_output_DBFGM$changepoint_save[(nburn_perf+1):(nburn_perf+nsave_perf)];
-  for (s_i in 1:2){
-    mcmc_output[[s_i]]$C_save = mcmc_output_DBFGM[[s_i]]$C_save[,,(nburn_perf+1):(nburn_perf+nsave_perf)]
-    mcmc_output[[s_i]]$adj_save = mcmc_output_DBFGM[[s_i]]$adj_save[,,(nburn_perf+1):(nburn_perf+nsave_perf)]
-    mcmc_output[[s_i]]$Sig_save = mcmc_output_DBFGM[[s_i]]$Sig_save[,,(nburn_perf+1):(nburn_perf+nsave_perf)]
-    mcmc_output[[s_i]]$pii_block_save = mcmc_output_DBFGM[[s_i]]$pii_block_save[,,(nburn_perf+1):(nburn_perf+nsave_perf)]
-    mcmc_output[[s_i]]$B_save = mcmc_output_DBFGM[[s_i]]$B_save[,,(nburn_perf+1):(nburn_perf+nsave_perf)]
-    mcmc_output[[s_i]]$sigma_epsilon_save = mcmc_output_DBFGM[[s_i]]$sigma_epsilon_save[(nburn_perf+1):(nburn_perf+nsave_perf)]
-  }
+  # mcmc_output = mcmc_output_DBFGM
+  # nburn_perf = 3000
+  # nsave_perf = 2000
+  # mcmc_output$changepoint_save = mcmc_output_DBFGM$changepoint_save[(nburn_perf+1):(nburn_perf+nsave_perf)];
+  # for (s_i in 1:2){
+  #   mcmc_output[[s_i]]$C_save = mcmc_output_DBFGM[[s_i]]$C_save[,,(nburn_perf+1):(nburn_perf+nsave_perf)]
+  #   mcmc_output[[s_i]]$adj_save = mcmc_output_DBFGM[[s_i]]$adj_save[,,(nburn_perf+1):(nburn_perf+nsave_perf)]
+  #   mcmc_output[[s_i]]$Sig_save = mcmc_output_DBFGM[[s_i]]$Sig_save[,,(nburn_perf+1):(nburn_perf+nsave_perf)]
+  #   mcmc_output[[s_i]]$pii_block_save = mcmc_output_DBFGM[[s_i]]$pii_block_save[,,(nburn_perf+1):(nburn_perf+nsave_perf)]
+  #   mcmc_output[[s_i]]$B_save = mcmc_output_DBFGM[[s_i]]$B_save[,,(nburn_perf+1):(nburn_perf+nsave_perf)]
+  #   mcmc_output[[s_i]]$sigma_epsilon_save = mcmc_output_DBFGM[[s_i]]$sigma_epsilon_save[(nburn_perf+1):(nburn_perf+nsave_perf)]
+  # }
   ## Get model performances before and after the change point
+  param_true = data_changepoint_rep$param_true
   for (s_i in 1:2){
     data_oneint = list()  # data and estimations inside one state/interval
-    data_oneint$G_x_true = data$param_true$G_x_true[[s_i]]
-    data_oneint$G_b_true = data$param_true$G_b_true[[s_i]]
-    data_oneint$Omega_b_true = data$param_true$Omega_b_true[[s_i]]
-    data_oneint$B_true = data$param_true$B_true[[s_i]]
-    data_oneint$F_true = data$param_true$F_true
-    data_oneint$K_true = data$param_true$K_true
+    data_oneint$G_x_true = param_true$G_x_true[[s_i]]
+    data_oneint$G_b_true = param_true$G_b_true[[s_i]]
+    data_oneint$Omega_b_true = param_true$Omega_b_true[[s_i]]
+    data_oneint$B_true = param_true$B_true[[s_i]]
+    data_oneint$F_true = param_true$F_true
+    data_oneint$K_true = param_true$K_true
     mcmc_output_oneint = mcmc_output[[s_i]]
     
-    performance_graph = get_mcmc_perf_blocked_graph_v2(mcmc_output_oneint, data_oneint, 
+    performance_graph = get_mcmc_perf_graph(mcmc_output_oneint, data_oneint, 
                                                        K, p, standardize = FALSE, block_thresh = 0.5, disp = FALSE)
     cat("\nGraph estimation performance of state ", s_i, "\n")
-    print_results(performance_graph, data_oneint)
-    
+    print_mcmc_results(performance_graph, data_oneint)
+
     file_name = paste("MCMC_performance_DBFGM_s", s_i, "_rep", rep_ind, ".Rdata", sep = "")
     save(performance_graph, file=paste(folder_name, '/', file_name, sep = ""))
   }

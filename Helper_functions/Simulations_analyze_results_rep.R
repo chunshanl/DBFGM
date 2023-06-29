@@ -4,22 +4,22 @@ library(fda)
 library(coda)
 
 rm(list = ls()); 
-setwd("C:/E/1_BFGM/Code -v7 replications/Helper_functions")
+setwd("C:/E/1_BFGM/DBFGM/Helper_functions")
 source('simulation_functions.R')
 source('performance_functions.R')
-setwd("C:/E/1_BFGM/Code -v7 replications")
+setwd("C:/E/1_BFGM/DBFGM")
 
 ### Load results BDFGM--------------
-nrep = 25
+nrep = 24
 tpr = matrix(NA, nrep, 2); fpr = matrix(NA, nrep, 2); mcc = matrix(NA, nrep, 2)
-for (rep_ind in 1:nrep){
+for (rep_ind in 1:24){
   for (s_i in 1:2){
     folder_name = "Simulation_results_DBFGM"
     file_name = paste("MCMC_performance_DBFGM_s", s_i, "_rep", rep_ind, ".Rdata", sep = "")
     load(file=paste(folder_name, '/', file_name, sep = ""))
-    tpr[rep_ind, s_i] = performance_graph$block_perf_v1$tpr_block
-    fpr[rep_ind, s_i] = performance_graph$block_perf_v1$fpr_block
-    mcc[rep_ind, s_i] = performance_graph$block_perf_v1$mcc_block
+    tpr[rep_ind, s_i] = performance_graph$block_perf$tpr_block
+    fpr[rep_ind, s_i] = performance_graph$block_perf$fpr_block
+    mcc[rep_ind, s_i] = performance_graph$block_perf$mcc_block
     
   }
 }

@@ -55,34 +55,22 @@ call_DBFGM = function(data_input,
     b <- create.fourier.basis(c(0,1),nbasis = K  )
     FLC = eval.basis(U, b)   # T_data * K
   }
+  # matplot(FLC, type = 'l')
   
   ### Initialize change point
   changepoint = round(T_data/2)
   
   ### Initialize basis coefficients
   B = init_B(FLC, Y, n, p, K, changepoint, T_data)
-  #apply(B[[2]], 2, var)
-  #X = compute_X(B, FLC, changepoint, K, p, T_data)
-  #plot(Y[10,,13])
-  #lines(X[10,,13], col = 2)
-  # plot(data_input$param_true$B_true[[2]][1,])
+  #B = data_input$param_true$B_true
+  # X = compute_X(B, FLC, interval_ind, p)
+  # plot(Y[10,,1])
+  # lines(X[10,,1], col = 2)
   
   # s_i = 1
-  # Scov = t(B[[s_i]])%*%B[[s_i]]
-  # B[[s_i]]
-  # matplot(B[[s_i]], type = 'l')
-  # diag(Scov)
-  # plot(diag(Scov))
-  # i = 1; j = 1
-  # temp = solve( t(FLC_temp) %*% FLC_temp) %*% t(FLC_temp) %*% Y[i, time_index, j]
-  # plot(Y[i, time_index, j])
-  # lines(FLC_temp[,-1]%*%temp[-1])
-  # lines(FLC_temp[,]%*%temp[], col = 2)
-  # temp = solve( t(FLC_temp[,-1]) %*% FLC_temp[,-1]) %*% t(FLC_temp[,-1]) %*% Y[i, time_index, j]
-  # lines(FLC_temp[,-1]%*%temp, col = 3)
-  # matplot(FLC_temp, type = 'l')
-  # plot(FLC_temp[,4])
-  # temp
+  # temp = var(B[[s_i]])
+  # diag(temp)
+  # plot(diag(temp))
   
   ### Initialize sigma_epsilon
   interval_ind = matrix(NA, 2, 2)
@@ -92,23 +80,23 @@ call_DBFGM = function(data_input,
   sigma_epsilon = c()
   temp = Y - X
   for (s_i in 1:2){
-    sigma_epsilon[s_i] = sd(temp[,interval_ind[s_i,],])
+    sigma_epsilon[s_i] = sd(temp[,interval_ind[s_i,1]:interval_ind[s_i,2],])
   }
+  
   # sigma_epsilon = data_input$param_true$sigma_epsilon_true
   
   ### Initialize block-wise edge inclusion probabilities
-  temp = matrix(1/2, nrow = p, ncol = p)    # initialize probabilities at 1/2
-  #!!!!!!!!!!!!!!!!!!!!!!!!
+  temp = matrix(1/2, nrow = p, ncol = p)   
   diag(temp) = 1
   pii_block = list()
   for (s_i in 1:2){pii_block[[s_i]] = temp}
   
   ### Initialize precision matrices and graphs
-  # True values
+  # # True values
   # C = data_input$param_true$Omega_b_true
   # Sig = list()
   # for (s_i in 1:2){Sig[[s_i]] = solve(C[[s_i]])}
-  # adj = data_input$param_true$G_b_true 
+  # adj = data_input$param_true$G_b_true
   
   # Use diag
   C = list(); adj = list()
@@ -130,7 +118,7 @@ call_DBFGM = function(data_input,
                                        nburn, nsave, 
                                        disp);
   
-  # Save parameters and initializations
+  # Save parameters and initialization
   mcmc_output$B = B
   mcmc_output$sigma_epsilon = sigma_epsilon
   mcmc_output$adj = adj; mcmc_output$Sig = Sig; mcmc_output$C = C

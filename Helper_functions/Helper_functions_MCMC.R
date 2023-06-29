@@ -1,14 +1,18 @@
 init_B = function(FLC, Y, n, p, K, changepoint, T_data){
-  B = list(); for (s_i in 1:2){B[[s_i]] = array(0, c(n, p*K))}
-  for (i in 1:n){
-    for (j in 1:p){
-      temp = solve( t(FLC) %*% FLC) %*% t(FLC) %*% Y[i,, j]
-      temp1 = ((j-1)*K+1):(j*K)
-      for (s_i in 1:2){
-        B[[s_i]][ i, temp1 ] = temp
-      }
-    }
+  B = list(); 
+  for (s_i in 1:2){
+    B[[s_i]] = array(rnorm(n*p*K, mean = 0, sd = 1), c(n, p*K))
   }
+  
+  # for (i in 1:n){
+  #   for (j in 1:p){
+  #     temp = solve( t(FLC) %*% FLC) %*% t(FLC) %*% Y[i,, j]
+  #     temp1 = ((j-1)*K+1):(j*K)
+  #     for (s_i in 1:2){
+  #       B[[s_i]][ i, temp1 ] = temp
+  #     }
+  #   }
+  # }
   interval_ind = list()
   interval_ind[[1]] = 1:(changepoint - 1)
   interval_ind[[2]] = changepoint:T_data
@@ -41,7 +45,7 @@ compute_X = function(B, FLC, interval_ind, p){
   X = array(NA, c(n, T_data, p))
   for (i in 1:p){
     for (s_i in 1:dim(interval_ind)[1]){
-      b = B[[s_i]][, ((i-1)*K+1):(i*K)]  # B_true is n*pk, b is of size n * K
+      b = B[[s_i]][, ((i-1)*K+1):(i*K)]  # B is n*pk, b is of size n * K
       temp = interval_ind[s_i,1]:interval_ind[s_i,2]
       X[, temp, i] = b %*% t(FLC[temp, ])
     }
@@ -92,7 +96,7 @@ compute_ind_noi = function(p_all_input){
 sample_C = function(Scov, C_input, Sig_input,adj_input, tau_input, 
                     pii_block_expand_input, V0, V1, lambda, ind_noi_all, n){
   
-  p_all_input = dim(Scov)[2]
+  p_all_input = dim(Scov)[1]
   
   
   for (i in 1:p_all_input){

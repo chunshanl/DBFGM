@@ -2,7 +2,6 @@
 rm(list = ls()); 
 library(wavelets)
 setwd("Helper_functions/FunGraph-main")
-
 #library(doParallel)
 # library(foreach)
 #registerDoParallel(24)
@@ -10,10 +9,9 @@ source('fgraph_cclasso.R')
 source('Cmat_update.R')
 source('Dmat_update.R')
 source('Lam_update.R')
-
-setwd("C:/E/1_BFGM/Code -v7 replications/Helper_functions")
-source('simulation_functions.R')
-setwd("C:/E/1_BFGM/Code -v7 replications")
+setwd("..")
+source('performance_functions.R')
+setwd("..")
 
 folder_name = "Simulation_results_DBFGM"  # folder to save results
 dir.create(folder_name)
@@ -21,13 +19,11 @@ dir.create(folder_name)
 ### Set up MCMC
 # Model parameters
 MCMCspecs = list(B=1000,thin=5,burnin=1000,update=1000);
-# MCMCspecs = list(B=10,thin=1,burnin=10,update=10);
 D_prior = list(a=0.1,b=0.1); lam_prior = list(a=0.1,b=1);
 nrep = 25
 # storage for the model performance measurements
 performance_all = list(graph_est = vector("list", length = nrep))
 
-rep_ind  =1
 ### Run MCMC -------------------------------------------------------
 
 for (rep_ind in 1:nrep){

@@ -2,28 +2,33 @@
 
 rm(list = ls()); 
 library(wavelets)
+setwd("Helper_functions/FunGraph-main")
+#library(doParallel)
+# library(foreach)
+#registerDoParallel(24)
 source('fgraph_cclasso.R')
 source('Cmat_update.R')
 source('Dmat_update.R')
 source('Lam_update.R')
-source('simulation_functions.R')
+setwd("..")
+source('performance_functions.R')
+setwd("..")
 
 ### Set up MCMC
 # Model parameters
 MCMCspecs = list(B=1000,thin=5,burnin=1000,update=1000);
-# MCMCspecs = list(B=10,thin=1,burnin=10,update=10);
 D_prior = list(a=0.1,b=0.1); lam_prior = list(a=0.1,b=1);
 
 rep_ind = 1
 ### Run MCMC -------------------------------------------------------
-for (rep_ind in 6:25){
+for (rep_ind in 1:25){
   
   print(rep_ind)
   blfgm_output = list()
   
   ## Load data 
-  folder_name = "Simulation_data/Simulation_data_add_random_noise"
-  file_name = paste("Simulation_data_rep", rep_ind, ".Rdata", sep = "")
+  folder_name = "Simulation_data"
+  file_name = paste("Synthetic_data_rep", rep_ind, ".Rdata", sep = "")
   file=paste(folder_name, '/', file_name, sep = "")
   load(file)
   # Get data
@@ -33,6 +38,7 @@ for (rep_ind in 6:25){
   folder_name = "Simulation_results_BLFGM/"
   file_name = paste("MCMC_output_BLFGM_alldata_rep", rep_ind, ".Rdata", sep = "")
   load(file=paste(folder_name, '/', file_name, sep = ""))
+  
   blfgm_output$performance = list()
   
   fgbay.est.all <- blfgm_output$fgbay.est

@@ -3,17 +3,14 @@ library(mvtnorm)
 library(fda)
 
 rm(list = ls()); 
-setwd("C:/E/1_BFGM/Code -v7 replications/Helper_functions")
-source('simulation_functions.R')
+setwd("Helper_functions")
 source('performance_functions.R')
-setwd("C:/E/1_BFGM/Code -v7 replications")
-
+setwd("..")
 folder_name = "Simulation_results_PSFGM"  # folder to save results
 dir.create(folder_name)
 
 ### Run MCMC -------------------------------------------------------
-
-for (rep_ind in 1:25){
+for (rep_ind in 1:50){
   
   print(rep_ind)
   psfgm_output = list()
@@ -55,7 +52,7 @@ for (rep_ind in 1:25){
   }
   
   ## Save results 
-  folder_name = "Simulation_results_PSFGM/"
+  folder_name = "Simulation_results_PSFGM"
   file_name = paste("Output_PSFGM_rep", rep_ind, ".Rdata", sep = "")
   save(psfgm_output, file=paste(folder_name, '/', file_name, sep = ""))
   

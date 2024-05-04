@@ -4,15 +4,14 @@ library(fda)
 library(coda)
 
 rm(list = ls()); 
-setwd("C:/E/1_BFGM/DBFGM/Helper_functions")
-source('simulation_functions.R')
+setwd("Helper_functions")
 source('performance_functions.R')
-setwd("C:/E/1_BFGM/DBFGM")
+setwd("..")
 
 ### Load results BDFGM--------------
-nrep = 24
+nrep = 50
 tpr = matrix(NA, nrep, 2); fpr = matrix(NA, nrep, 2); mcc = matrix(NA, nrep, 2)
-for (rep_ind in 1:24){
+for (rep_ind in 1:nrep){
   for (s_i in 1:2){
     folder_name = "Simulation_results_DBFGM"
     file_name = paste("MCMC_performance_DBFGM_s", s_i, "_rep", rep_ind, ".Rdata", sep = "")
@@ -32,9 +31,8 @@ apply(mcc, 2, sd)
 
 
 ### Load results PSFGM----------------------
-# Simulation_PSFGM_rep.R
 folder_name = "Simulation_results_PSFGM/"
-nrep = 25
+nrep = 50
 tpr = matrix(NA, nrep, 2); fpr = matrix(NA, nrep, 2); mcc = matrix(NA, nrep, 2)
 for (rep_ind in 1:nrep){
   for (s_i in 1:2){
@@ -60,7 +58,7 @@ folder_name = "Simulation_results_BLFGM"
 nrep = 25
 tpr = matrix(NA, nrep, 2); fpr = matrix(NA, nrep, 2); mcc = matrix(NA, nrep, 2)
 for (rep_ind in 1:nrep){
-  file_name = paste("MCMC_output_BLFGM_alldata_rep", rep_ind, ".Rdata", sep = "")
+  file_name = paste("MCMC_output_BLFGM_rep", rep_ind, ".Rdata", sep = "")
   load(file=paste(folder_name, '/', file_name, sep = ""))
   for (s_i in 1:2){
     tpr[rep_ind, s_i] = blfgm_output$performance[[s_i]][1]
@@ -88,7 +86,7 @@ apply(mcc, 2, sd)
 
 
 # BGGM -----------------
-nrep = 25
+nrep = 50
 tpr = matrix(NA, nrep, 2); fpr = matrix(NA, nrep, 2); mcc = matrix(NA, nrep, 2)
 for (rep_ind in 1:nrep){
   folder_name = "Simulation_results_BGGM"

@@ -26,8 +26,8 @@ An example of applying the proposed model and doing posterior analysis can be fo
 
 - Helper functions
   - This folder contains helper functions for the MCMC algorithms and for regenerating the results presented in the paper. They are called in the script and don't need to be run independently.
-  - call_DBFGM.R: This is the functions to call the MCMC algorithm of the proposed dynamic Bayesian functional graphical model in this paper. It generate initial values, and pass data and hyperparameters into the MCMC algorithms.
-  - MCMC_changepoint_DBFGM.R: MCMC algorithm of the proposed dynamic Bayesian functional graphical model. It is called by call_DBFGM.R.
+  - call_functions.R: This is the functions to call the MCMC algorithm of the proposed dynamic Bayesian functional graphical model in this paper. It generate initial values, and pass data and hyperparameters into the MCMC algorithms. It also contains the call functions of other models that are used for model comparison.
+  - MCMC_algorithms.R: MCMC algorithm of the proposed dynamic Bayesian functional graphical model. It is called by call_DBFGM.R. It also contains the MCMC algorithms of other models that are used for model comparison.
 
 - sst_data
   - The sea surface temperature data set. It is available on the [ERA5 website] (https://cds.climate.copernicus.eu/cdsapp#!/search?type=dataset). The processed data is also provided for convenience.

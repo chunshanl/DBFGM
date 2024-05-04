@@ -1,5 +1,4 @@
 ## SSSL on two time points
-
 library(BDgraph)
 library(pheatmap)
 library(fda)
@@ -7,14 +6,12 @@ library(coda)
 
 rm(list = ls()); 
 
-setwd("C:/E/1_BFGM/Code -v7 replications/Helper_functions")
-source('simulation_functions.R')
+setwd("Helper_functions")
+source('Call_functions.R')
+source('MCMC_algorithms.R')
 source('Helper_functions_mcmc.R')
 source('performance_functions.R')
-source('Call_functions_other.R')
-source('MCMC_algorithms_other.R')
-
-setwd("C:/E/1_BFGM/Code -v7 replications")
+setwd("..")
 
 
 ### Simulation parameters ---------------------------
@@ -26,7 +23,7 @@ h = 50^2;
 v1 = v0 * h
 disp = TRUE
 pii = 3/(p-1)
-
+t_list = c(256/4, 256/4*3)
 
 ### Set up MCMC ------------------------------------------------------
 folder_name = "Simulation_results_BGGM"
@@ -35,7 +32,7 @@ dir.create(folder_name)
 
 ### Run MCMC -------------------------------------------------------
 
-for (rep_ind in 1:25){  # 3:4
+for (rep_ind in 1:50){
   print(rep_ind)
   
   mcmc_output_full = c(); mcmc_output = c()
@@ -45,9 +42,7 @@ for (rep_ind in 1:25){  # 3:4
   file_name = paste("Synthetic_data_rep", rep_ind, ".Rdata", sep = "")
   file=paste(folder_name, '/', file_name, sep = "")
   load(file)
-  changepoint_true = data_changepoint_rep$param_true$changepoint_true
-  T_data = dim(data_changepoint_rep$Y)[2]
-  t_list = c(256/4, 256/4*3)
+
   performance_graph = list()
   
   ## Run MCMC
@@ -70,7 +65,7 @@ for (rep_ind in 1:25){  # 3:4
       (sqrt(temp$tp + temp$fp) * sqrt(temp$tp + temp$fn) * sqrt(temp$tn + temp$fp) * sqrt(temp$tn + temp$fn))
     
     print(c(tpr,fpr,mcc))
-    
+    performance_graph[[s_i]] = c(tpr,fpr,mcc)
   }
     
   folder_name = "Simulation_results_BGGM"
@@ -78,9 +73,3 @@ for (rep_ind in 1:25){  # 3:4
   save(performance_graph, file=paste(folder_name, '/', file_name, sep = ""))
   
 }
-
-## Summary of all models --------------------------------
-file.edit('Helper_functions/Simulations_analyze_results_rep.R')
-
-
-

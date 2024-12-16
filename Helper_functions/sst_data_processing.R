@@ -27,6 +27,7 @@ selected_points = c(-130,30,
 locations = matrix(selected_points, ncol = 2, byrow = T)
 
 # ### Load .nc data from different years, filter locations, save as csv
+# Raw data is downloaded from the ERA5 reanalysis
 # setwd('./sst_data')
 # filenames <- list.files(pattern="*.nc", full.names=TRUE)
 # for (cur_filename in filenames){

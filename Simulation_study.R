@@ -143,8 +143,6 @@ file.edit('Helper_functions/Simulations_BGGM_rep.R')
 file.edit('Helper_functions/Simulations_analyze_results_rep.R')
 
 
-
-
 ########
 ## Sample from Prior -------------------
 ########
@@ -170,15 +168,16 @@ v0 = 0.02^2  # spike variance
 h = 50^2;   
 v1 = v0 * h   # slab variance
 disp = TRUE    # display MCMC progress
-a_pi = 2; b_pi = 7
-print(paste0('prior mean of pi: ', a_pi/(a_pi + b_pi)))
-print(paste0('prior variance of pi: ', a_pi*b_pi/(a_pi + b_pi)^2/(a_pi + b_pi + 1)))
+a_pi = 2; 
+e_p = 1/(p-1)
+print(paste0('mean of beta distribution is set to: ', e_p))
+# compute desired b_pi
+b_pi = (a_pi - a_pi * e_p)/e_p
+#b_pi = 7
+print(paste0('prior mean of betga: ', a_pi/(a_pi + b_pi)))
+print(paste0('prior variance of beta: ', a_pi*b_pi/(a_pi + b_pi)^2/(a_pi + b_pi + 1)))
 x <- rbeta(10000, a_pi, b_pi)                              
 hist(x, freq=F, col="grey", border="white",main="rbeta(10000, 2, 1)", xlab="x", ylab="f(x)")          
-print(paste0('desired edge inclusion probability is: ', 2/(p-1)))
-# compute desired b_pi
-ind_temp = 2
-b_pi = (a_pi - a_pi * e_p)/e_p
 # MCMC initial values
 pii_block = matrix(1/2, nrow = p, ncol = p)   
 diag(pii_block) = 1
@@ -187,7 +186,7 @@ C = diag(p_all); adj = diag(TRUE, p_all)
 Sig = C
 ## Sample from prior
 nburn = 1000
-nsave = 1000
+nsave = 2000
 disp = FALSE
 set.seed(1)
 output = MCMC_from_DBFGM_prior(p,K, 
@@ -203,7 +202,6 @@ post_mean = mean(ppi_local[ind_upper])
 p_output_vec = c(p_output_vec, post_mean)
 print(paste0('mean of edge inclusion probability: ', mean(ppi_local[ind_upper])))
 print(paste0('std of edge inclusion probability: ', sd(ppi_local[ind_upper])))
-
 
 
 ################

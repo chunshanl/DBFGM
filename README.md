@@ -6,7 +6,7 @@ Author: Chunshan Liu
 Contact: chunshanl@hotmail.com
 
 This is the R code to reproduce results in the following paper:
->Dynamic Bayesian Functional Graphical Models, Chunshan Liu, Daniel R. Kowal, and Marina Vannucci
+>Bayesian Functional Graphical Models With Change-Point Detection, Chunshan Liu, Daniel R. Kowal, James Doss-Gollin, and Marina Vannucci
 ______________________________
 
 ## Introduction
@@ -29,8 +29,6 @@ An example of applying the proposed model and doing posterior analysis can be fo
   - call_functions.R: This is the functions to call the MCMC algorithm of the proposed dynamic Bayesian functional graphical model in this paper. It generate initial values, and pass data and hyperparameters into the MCMC algorithms. It also contains the call functions of other models that are used for model comparison.
   - MCMC_algorithms.R: MCMC algorithm of the proposed dynamic Bayesian functional graphical model. It is called by call_DBFGM.R. It also contains the MCMC algorithms of other models that are used for model comparison.
 
-- sst_data
-  - The sea surface temperature data set. It is available on the [ERA5 website] (https://cds.climate.copernicus.eu/cdsapp#!/search?type=dataset). The processed data is also provided for convenience.
 
 ## Acknowledgements
 

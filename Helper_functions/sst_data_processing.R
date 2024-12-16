@@ -28,58 +28,58 @@ locations = matrix(selected_points, ncol = 2, byrow = T)
 
 # ### Load .nc data from different years, filter locations, save as csv
 # Raw data is downloaded from the ERA5 reanalysis
+setwd('./sst_data')
+filenames <- list.files(pattern="*.nc", full.names=TRUE)
+for (cur_filename in filenames){
+  nc = nc_open(cur_filename)
+
+  print(nc$var$sst$dim[[1]]$name)
+  longitude = nc$var$sst$dim[[1]]$vals
+  print(max(longitude))
+
+  print(nc$var$sst$dim[[2]]$name)
+  #print(nc$var$sst$dim[[1]]$vals)
+  latitude = nc$var$sst$dim[[2]]$vals
+  # plot(nc$var$sst$dim[[2]]$vals)
+
+  hour_since_1900 = nc$var$sst$dim[[3]]$vals
+  timestamp = as.POSIXct("1900-01-01 00:00:00.0", tz = 'UTC' ) + hour_since_1900 * 3600
+  print(max(timestamp))
+  print(min(timestamp))
+
+  data = ncvar_get(nc, 'sst')   # longitude, latitude, time
+
+  nc_close(nc)
+
+  ## filter data
+  data_filtered = c()
+  temp1 = 1:length(longitude)
+  temp2 = 1:length(latitude)
+  for (i in 1:dim(locations)[1]){
+    ind1 = temp1[locations[i,1] == longitude]
+    ind2 = temp2[locations[i,2] == latitude]
+    data_filtered = c(data_filtered, data[ind1, ind2,])
+  }
+  data_filtered = matrix(c(data_filtered, hour_since_1900), nrow = length(hour_since_1900))
+
+  ## Save data
+  cur_name = paste(format(timestamp[1], format = '%Y'), '.csv', sep = "")
+  write.table(data_filtered, file=cur_name,
+              row.names = F, col.names = F, sep = ",")
+
+}
+
+### Combine all files from different years
+data_all = data.frame(matrix(ncol = 17, nrow = 0))
 # setwd('./sst_data')
-# filenames <- list.files(pattern="*.nc", full.names=TRUE)
-# for (cur_filename in filenames){
-#   nc = nc_open(cur_filename)
-# 
-#   print(nc$var$sst$dim[[1]]$name)
-#   longitude = nc$var$sst$dim[[1]]$vals
-#   print(max(longitude))
-# 
-#   print(nc$var$sst$dim[[2]]$name)
-#   #print(nc$var$sst$dim[[1]]$vals)
-#   latitude = nc$var$sst$dim[[2]]$vals
-#   # plot(nc$var$sst$dim[[2]]$vals)
-# 
-#   hour_since_1900 = nc$var$sst$dim[[3]]$vals
-#   timestamp = as.POSIXct("1900-01-01 00:00:00.0", tz = 'UTC' ) + hour_since_1900 * 3600
-#   print(max(timestamp))
-#   print(min(timestamp))
-# 
-#   data = ncvar_get(nc, 'sst')   # longitude, latitude, time
-# 
-#   nc_close(nc)
-# 
-#   ## filter data
-#   data_filtered = c()
-#   temp1 = 1:length(longitude)
-#   temp2 = 1:length(latitude)
-#   for (i in 1:dim(locations)[1]){
-#     ind1 = temp1[locations[i,1] == longitude]
-#     ind2 = temp2[locations[i,2] == latitude]
-#     data_filtered = c(data_filtered, data[ind1, ind2,])
-#   }
-#   data_filtered = matrix(c(data_filtered, hour_since_1900), nrow = length(hour_since_1900))
-# 
-#   ## Save data
-#   cur_name = paste(format(timestamp[1], format = '%Y'), '.csv', sep = "")
-#   write.table(data_filtered, file=cur_name,
-#               row.names = F, col.names = F, sep = ",")
-# 
-# }
-# 
-# ### Combine all files from different years
-# data_all = data.frame(matrix(ncol = 17, nrow = 0))
-# # setwd('./sst_data')
-# filenames <- list.files(pattern="*.csv", full.names=TRUE)
-# for (cur_name in filenames){
-#   cur_data = read.csv(cur_name, header = F)
-#   data_all = rbind(data_all, cur_data)
-# }
-# cur_name = paste('sst_update.csv')
-# write.table(data_all, file=cur_name,
-#             row.names = F, col.names = F, sep = ",")
+filenames <- list.files(pattern="*.csv", full.names=TRUE)
+for (cur_name in filenames){
+  cur_data = read.csv(cur_name, header = F)
+  data_all = rbind(data_all, cur_data)
+}
+cur_name = paste('sst_update.csv')
+write.table(data_all, file=cur_name,
+            row.names = F, col.names = F, sep = ",")
 
 ### Read and reshape data --------
 sst_input = read.csv('sst_data/sst_update.csv')
